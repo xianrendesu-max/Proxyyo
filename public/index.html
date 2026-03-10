@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Proxy</title>
+    <style>
+        :root { --bg: #0f0f12; --accent: #7289da; --text: #ffffff; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .card { background: #1a1a1f; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 450px; text-align: center; border: 1px solid #333; }
+        h1 { font-weight: 300; letter-spacing: 2px; margin-bottom: 30px; color: var(--accent); }
+        .input-group { position: relative; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px 20px; background: #25252b; border: 1px solid #444; border-radius: 8px; color: white; box-sizing: border-box; font-size: 16px; transition: 0.3s; }
+        input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 10px rgba(114, 137, 218, 0.3); }
+        button { width: 100%; padding: 15px; background: var(--accent); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>SHADOW</h1>
+        <div class="input-group">
+            <input type="text" id="url" placeholder="Enter URL to browse stealthily..." autocomplete="off">
+        </div>
+        <button onclick="launch()">Launch Stealth Mode</button>
+    </div>
+
+    <script>
+        function launch() {
+            const urlValue = document.getElementById('url').value;
+            if (!urlValue) return;
+            
+            const target = urlValue.startsWith('http') ? urlValue : 'https://' + urlValue;
+            const b64 = btoa(target);
+            const proxyUrl = window.location.origin + '/p?u=' + b64;
+
+            // About:Blank 隠蔽ロジック
+            const win = window.open('about:blank', '_blank');
+            if (win) {
+                win.document.body.style.margin = '0';
+                win.document.body.style.height = '100vh';
+                const iframe = win.document.createElement('iframe');
+                iframe.style.border = 'none';
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.margin = '0';
+                iframe.src = proxyUrl;
+                win.document.body.appendChild(iframe);
+            } else {
+                alert('Pop-up blocked! Please allow pop-ups for stealth mode.');
+            }
+        }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+    </script>
+</body>
+</html>
